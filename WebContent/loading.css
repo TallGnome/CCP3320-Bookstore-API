@@ -1,0 +1,81 @@
+.loading-container {
+    position: absolute;
+    top:0;
+    left:0;
+    z-index: 1000;
+  height: 100%;
+  width: 100%;
+  color: #2d6ca2;
+  background-color: rgba(255,255,255, .45);
+  background-repeat: repeat-x;
+  filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#fff5f5f5', endColorstr='#ffe8e8e8', GradientType=0);
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 6px;
+  -moz-box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 6px;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 6px;
+  -o-box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 6px;
+}
+
+.loading-cloud {
+    position: absolute;
+    top: 45%;
+    left: 45%;
+    font-size: 450%;
+}
+
+.loading-drop1,
+.loading-drop2,
+.loading-drop3 {
+    position: absolute;
+    font-size: 100%;
+    transform: rotateZ(30deg);
+    animation: move 1s steps(1000) infinite;
+    top: 48%;
+    left: 48%;
+}
+
+.loading-drop1 {
+  animation-delay: 300ms;
+}
+
+.loading-drop2 {
+  animation-delay: 0ms;
+}
+
+.loading-drop3 {
+  animation-delay: 100ms;
+}
+
+.loading-text {
+  position: absolute;
+  top: 65%;
+  left: 46%;
+  animation: blink 1.5s steps(1000) infinite;
+}
+
+@keyframes move {
+  0% {
+    top: 48%;
+    left: 48%;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    top: 80%;
+    left: 42%;
+    opacity: 0;
+  }
+}
+
+@keyframes blink {
+  25% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0;
+  }
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+}

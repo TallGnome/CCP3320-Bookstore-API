@@ -1,0 +1,222 @@
+ <!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="ISO-8859-1">
+		<title>Bookstore in the Clouds</title>
+        
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="./bulma.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+		<link rel="stylesheet" href="./style.css">
+        <link rel="stylesheet" href="./loading.css">
+        
+		<script	src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="	crossorigin="anonymous"></script>
+		
+		<script src="https://unpkg.com/vue/dist/vue.js" ></script>
+	</head>
+	<body>
+		<div id="app" class="container-fluid is-overlay f-col">
+            <div class="columns fill-height-10 search-bar">
+                <div class="column is-1 is-offset-1">
+                    <a class="button is-white" v-on:click="load_books">
+                        <i class="fa fa-refresh"></i>
+                    </a>
+                </div>
+                <div class="column is-1 ">
+                    <a class="button is-white" v-on:click="toggleCreateMode">
+                        <i class="fa fa-plus"></i>
+                    </a>
+                </div>
+                <div class="field column is-5 is-offset-1">
+                    <p class="control">
+                        <input class="input" type="text" placeholder="Search book..." v-model="search">
+                    </p>
+                </div>
+                <div class="column is-1">
+                    <a class="button is-white" v-on:click="searchBook">
+                        <i class="fa fa-search"></i>
+                    </a>
+                </div>
+            </div>
+			<div class="columns fill-height-80">
+				<div class="column is-4 height-margin">
+                    <div class="card full-height card-light">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                            All Books
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <div class="is-fullwidth list-item" v-for="item in books">
+                                <a v-on:click="show_details(item)" class="item is-fullwidth columns">
+                                    <div class="column is-4 f-col-center item-cont">
+                                        <i class="fa fa-book  c-child"></i> 
+                                    </div>
+                                    <div class="column is-8 item-cont">
+                                        <span class="column is-12 item-cont" ><h3> <b>{{item.title}} </b></h3></span> 
+                                        <span class="column is-12 item-cont" ><h4>{{item.author}}</h4></span>
+                                    </div> 
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+				<div class="column is-6 is-offset-1 height-margin">
+                    <!--<book-view></book-view>-->
+                    <!--<div :is="selected"></div>-->
+                    <div v-if="selected != null && !editMode && selectedState && !createMode" class='card card-strong full-height'>
+                        <div class='card-header'>
+                            <p class='card-header-title'>Book Details</p>
+                            <a class="card-header-icon" v-on:click="change_edit_state">
+                                <span class="icon">
+                                    <i class="fa fa-pencil"></i>
+                                </span>
+                            </a>
+                        </div>
+                        <div class='card-contents'>
+                            <div class='content has-text-centered'>
+                                <p> <strong>Title: </strong> {{selected.title}}</p> 
+                                <hr> 
+                                <p><strong>Author: </strong>{{selected.author}}</p> 
+                                <hr> 
+                                <p><strong>Publisher: </strong> {{selected.publisher}}</p> 
+                                <hr> 
+                                <p><strong>Language: </strong> {{selected.language}}</p> 
+                                <hr>
+                                <p><strong>ISBN: </strong> {{selected.ISBN}}</p> 
+                                <hr> 
+                                <p><strong>Subject: </strong> {{selected.subject}}</p> 
+                                <hr> 
+                                <p><strong>In stock: </strong> {{selected.inStock}}</p> 
+                            </div>
+                        </div>
+                        <footer class="card-footer">
+                            <a class="card-footer-item warning" v-on:click="cancelSelectedState">Close</a>
+                        </footer>
+                    </div>
+                    <div v-if="selected != null && editMode && !createMode" class='card card-strong full-height'>
+                        <div class='card-header'>
+                            <p class='card-header-title'>Edit Book</p>
+                        </div>
+                        <div class='card-contents'>
+                            <div class="field column is-6 is-offset-3">
+                                <label class="label">Title: </label>
+                                <p class="control">
+                                    <input class="input" type="text" v-model="selected.title" v-bind:class="{ 'is-danger' : isEmpty(selected.title) }">
+                                </p>
+                            </div>
+                            <div class="field column is-6 is-offset-3">
+                                <label class="label">Author: </label>
+                                <p class="control">
+                                    <input class="input" type="text" v-model="selected.author" v-bind:class="{ 'is-danger' : isEmpty(selected.author) }">
+                                </p>
+                            </div>
+                            <div class="field column is-6 is-offset-3">
+                                <label class="label">Publisher: </label>
+                                <p class="control">
+                                    <input class="input" type="text" v-model="selected.publisher" v-bind:class="{ 'is-danger' : isEmpty(selected.publisher) }">
+                                </p>
+                            </div>
+                            <div class="field column is-6 is-offset-3">
+                                <label class="label">Language: </label>
+                                <p class="control">
+                                    <input class="input" type="text" v-model="selected.language" v-bind:class="{ 'is-danger' : isEmpty(selected.language) }">
+                                </p>
+                            </div>
+                            <div class="field column is-6 is-offset-3">
+                                <label class="label">ISBN: </label>
+                                <p class="control">
+                                    <input class="input" type="text" v-model="selected.ISBN" v-bind:class="{ 'is-danger' : isEmpty(selected.ISBN) }">
+                                </p>
+                            </div>
+                            <div class="field column is-6 is-offset-3">
+                                <label class="label">Subject: </label>
+                                <p class="control">
+                                    <input class="input" type="text" v-model="selected.subject" v-bind:class="{ 'is-danger' : isEmpty(selected.subject) }">
+                                </p>
+                            </div>
+                            <div class="field column is-6 is-offset-3">
+                                <p class="control">
+                                    <label class="checkbox">
+                                    <input type="checkbox" v-model="selected.inStock">
+                                    In Stock?
+                                    </label>
+                                </p>
+                            </div>
+                        </div>
+                        <footer class="card-footer">
+                            <a class="card-footer-item warning" v-on:click="change_edit_state">Cancel</a>
+                            <a class="card-footer-item danger" v-on:click="deleteEntity">Delete</a>
+                            <a class="card-footer-item success" v-on:click="saveUpdate">Save</a>
+                        </footer>
+                    </div> 
+                    <div v-if="createMode && !selectedState" class='card card-strong full-height'>
+                        <div class='card-header'>
+                            <p class='card-header-title'>Create Book</p>
+                        </div>
+                        <div class='card-contents'>
+                            <div class="field column is-6 is-offset-3">
+                                <label class="label">Title: </label>
+                                <p class="control">
+                                    <input class="input" type="text" v-model="newEntity.title" v-bind:class="{ 'is-danger' : isEmpty(newEntity.title) }">
+                                </p>
+                            </div>
+                            <div class="field column is-6 is-offset-3">
+                                <label class="label">Author: </label>
+                                <p class="control">
+                                    <input class="input" type="text" v-model="newEntity.author" v-bind:class="{ 'is-danger' : isEmpty(newEntity.author) }">
+                                </p>
+                            </div>
+                            <div class="field column is-6 is-offset-3">
+                                <label class="label">Publisher: </label>
+                                <p class="control">
+                                    <input class="input" type="text" v-model="newEntity.publisher" v-bind:class="{ 'is-danger' : isEmpty(newEntity.publisher) }">
+                                </p>
+                            </div>
+                            <div class="field column is-6 is-offset-3">
+                                <label class="label">Language: </label>
+                                <p class="control">
+                                    <input class="input" type="text" v-model="newEntity.language" v-bind:class="{ 'is-danger' : isEmpty(newEntity.language) }">
+                                </p>
+                            </div>
+                            <div class="field column is-6 is-offset-3">
+                                <label class="label">ISBN: </label>
+                                <p class="control">
+                                    <input class="input" type="text" v-model="newEntity.ISBN" v-bind:class="{ 'is-danger' : isEmpty(newEntity.ISBN) }">
+                                </p>
+                            </div>
+                            <div class="field column is-6 is-offset-3">
+                                <label class="label">Subject: </label>
+                                <p class="control">
+                                    <input class="input" type="text" v-model="newEntity.subject" v-bind:class="{ 'is-danger' : isEmpty(newEntity.subject) }">
+                                </p>
+                            </div>
+                            <div class="field column is-6 is-offset-3">
+                                <p class="control">
+                                    <label class="checkbox">
+                                    <input type="checkbox" v-model="newEntity.inStock">
+                                    In Stock?
+                                    </label>
+                                </p>
+                            </div>
+                        </div>
+                        <footer class="card-footer">
+                            <a class="card-footer-item warning" v-on:click="toggleCreateMode">Cancel</a>
+                            <a class="card-footer-item success" v-on:click="create_book">Save</a>
+                        </footer>
+                    </div>   
+				</div>
+			</div>  
+            <div v-if="isLoading" class='loading-container text-center'>
+                <i class="fa fa-cloud loading-cloud" aria-hidden="true"></i>
+                <i class="fa fa-tint loading-drop1" aria-hidden="true"></i>
+                <i class="fa fa-tint loading-drop2" aria-hidden="true"></i>
+                <i class="fa fa-tint loading-drop3" aria-hidden="true"></i>
+                <i class='loading-text'>Loading...</i>
+            </div>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" ></script>
+        <script src="./component.js" defer ></script>
+	</body>
+</html>
